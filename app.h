@@ -40,10 +40,6 @@
  *  $Id: sample1.h 2416 2012-09-07 08:06:20Z ertl-hiro $
  */
 
-#pragma once
-
-#include "ev3api.h"
-
 /*
  *  ターゲット依存の定義
  */
@@ -77,7 +73,6 @@
  */
 #ifndef TOPPERS_MACRO_ONLY
 
-#include <stdio.h>
 extern void	main_task(intptr_t exinf);
 
 #endif /* TOPPERS_MACRO_ONLY */

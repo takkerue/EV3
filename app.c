@@ -1,15 +1,9 @@
 /**
- * Hello EV3
- *
- * This is a program used to test the whole platform.
+ * EV3RT baseline
  */
 
 #include "ev3api.h"
 #include "app.h"
-#include <unistd.h>
-#include <ctype.h>
-#include <string.h>
-
 
 #if defined(BUILD_MODULE)
 #include "module_cfg.h"
