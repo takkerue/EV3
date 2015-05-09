@@ -19,6 +19,10 @@
 #define _debug(x)
 #endif
 
+/**
+ * @brief メインタスク エントリポイント
+ * @detail EV3RT OSのMAIN_TASKエントリーポイント
+ */
 void main_task(intptr_t unused) {
 	while(1) {
 	}
