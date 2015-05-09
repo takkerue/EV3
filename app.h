@@ -30,7 +30,7 @@
  *      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
  *      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
  *      免責すること．
- * 
+ *
  *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
  *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
  *  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
@@ -78,60 +78,6 @@
 #ifndef TOPPERS_MACRO_ONLY
 
 #include <stdio.h>
-
-extern FILE *fio;
-
-/**
- * CLI Menu
- */
-
-typedef struct {
-    const char *title;
-    uint8_t     key;
-    ISR         handler;
-    intptr_t    exinf;
-} CliMenuEntry;
-
-typedef struct {
-    const char         *title;
-    const CliMenuEntry *entry_tab;
-    SIZE                entry_num;
-} CliMenu;
-
-void show_cli_menu(const CliMenu *cm, int offset_x, int offset_y, lcdfont_t font);
-const CliMenuEntry* select_menu_entry(const CliMenu *cm, int offset_x, int offset_y, lcdfont_t font);
-void show_message_box(const char *title, const char *msg);
-
-static inline
-void fio_clear_screen() {
-	fprintf(fio, "\033[2J\033[;H"); // Clear Screen
-}
-
-static inline
-void fio_clear_line() {
-	fprintf(fio, "\033[2K\033[255D"); // Clear Screen
-}
-
-extern const CliMenu climenu_main;
-
-/**
- * Default font
- */
-extern int32_t default_menu_font_width;
-extern int32_t default_menu_font_height;
-#define MENU_FONT (EV3_FONT_MEDIUM)
-#define MENU_FONT_WIDTH (default_menu_font_width)
-#define MENU_FONT_HEIGHT (default_menu_font_height)
-
-/**
- * Tasks
- */
-
-extern void	task(intptr_t exinf);
 extern void	main_task(intptr_t exinf);
-extern void balance_task(intptr_t exinf);
-extern void idle_task(intptr_t exinf);
-
-extern void	gpio_irq_dispatcher(intptr_t exinf);
 
 #endif /* TOPPERS_MACRO_ONLY */
