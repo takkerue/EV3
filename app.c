@@ -21,6 +21,7 @@
 
 // 内部関数プロトタイプ宣言
 static void LcdClear(void);
+static void LcdDrawStringAtLine(char *str, uint32_t line);
 static int ClockGetTime();
 static void ClockReset();
 
@@ -29,12 +30,8 @@ static void ClockReset();
  * @detail EV3RT OSのMAIN_TASKエントリーポイント
  */
 void main_task(intptr_t unused) {
-	int32_t fontHeight = 0;
-	int32_t fontWidth = 0;
 	ev3_sensor_config(EV3_PORT_1, TOUCH_SENSOR);
 
-	ev3_lcd_set_font(EV3_FONT_MEDIUM);
-	ev3_font_get_size(EV3_FONT_MEDIUM, &fontWidth, &fontHeight);
 	LcdClear();
 	while(1) {
 		if (ev3_button_is_pressed(LEFT_BUTTON)) {
@@ -46,12 +43,12 @@ void main_task(intptr_t unused) {
 		} else {
 			ev3_led_set_color(LED_OFF);
 		}
-	ev3_lcd_draw_string("TITLE", 0, (int32_t)(fontHeight * 1.5 * 0));
-	ev3_lcd_draw_string("TEXT", 0, (int32_t)(fontHeight * 1.5 * 1));
+	LcdDrawStringAtLine("TITLE", 0);
+	LcdDrawStringAtLine("TEXT", 1);
 	{
 		char text[100];
 		sprintf(text, "%d", ClockGetTime());
-		ev3_lcd_draw_string(text, 0, (int32_t)(fontHeight * 1.5 * 2));
+		LcdDrawStringAtLine(text, 2);
 	}
 	tslp_tsk(10);
 	}
@@ -86,7 +83,22 @@ static void ClockReset()
 	clockCount = 0;
 }
 
+/**
+ * @brief LCD表示内容のクリア
+ */
 static void LcdClear(void) {
 	ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE); // Clear menu area
+	return;
+}
+
+/**
+ * @brief LCDのline行分改行した位置に文字列表示
+ */
+static void LcdDrawStringAtLine(char *str, uint32_t line) {
+	int32_t fontHeight = 0;
+	int32_t fontWidth = 0;
+	ev3_lcd_set_font(EV3_FONT_MEDIUM);
+	ev3_font_get_size(EV3_FONT_MEDIUM, &fontWidth, &fontHeight);
+	ev3_lcd_draw_string(str, 0, (int32_t)(fontHeight * 1.5 * line));
 	return;
 }
