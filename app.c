@@ -54,33 +54,15 @@ void main_task(intptr_t unused) {
 	}
 }
 
-static int clockCount = 0;
-
-/**
- * @bried クロック計数周期ハンドラのエントリポイント
- * @note 1ms周期でカウントアップ
- * @param 周期ハンドラID
- */
-void clock_cychdr(intptr_t idx) {
-	++clockCount;
-	return;
-}
-
 /**
  * @brief タイマカウンタの取得
  * @return タイマカウンタ[ms]
  */
 static int ClockGetTime()
 {
-	return clockCount;
-}
-
-/**
- * @brief タイマカウンタのリセット
- */
-static void ClockReset()
-{
-	clockCount = 0;
+	SYSTIM count;
+	get_tim(&count);
+	return (int)count;
 }
 
 /**

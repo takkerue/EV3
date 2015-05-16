@@ -74,6 +74,5 @@
 #ifndef TOPPERS_MACRO_ONLY
 
 extern void main_task(intptr_t exinf);
-extern void clock_cychdr(intptr_t idx);
 
 #endif /* TOPPERS_MACRO_ONLY */
