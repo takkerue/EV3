@@ -43,14 +43,14 @@ void main_task(intptr_t unused) {
 		} else {
 			ev3_led_set_color(LED_OFF);
 		}
-	LcdDrawStringAtLine("TITLE", 0);
-	LcdDrawStringAtLine("TEXT", 1);
-	{
-		char text[100];
-		sprintf(text, "%d", ClockGetTime());
-		LcdDrawStringAtLine(text, 2);
-	}
-	tslp_tsk(10);
+		LcdDrawStringAtLine("TITLE", 0);
+		LcdDrawStringAtLine("TEXT", 1);
+		{
+			char text[100];
+			sprintf(text, "%d", ClockGetTime());
+			LcdDrawStringAtLine(text, 2);
+		}
+		tslp_tsk(10);
 	}
 }
 
