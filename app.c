@@ -23,17 +23,77 @@
 static void LcdClear(void);
 static void LcdDrawStringAtLine(char *str, uint32_t line);
 static int ClockGetTime();
-static void ClockReset();
+
+typedef struct {
+	unsigned char isPressed;
+	unsigned char wasPressed;
+} ButtonState;
+
+typedef enum {
+	StartButton = 0,
+	ResetButton,
+	NumOfButton
+} StopWatchButton;
+
+typedef enum {
+	StopMode = 0,
+	RunningMode,
+	NumOfMode
+} StopWatchMode;
 
 /**
  * @brief メインタスク エントリポイント
  * @detail EV3RT OSのMAIN_TASKエントリーポイント
  */
 void main_task(intptr_t unused) {
+	StopWatchMode mode = StopMode;
+	unsigned int baseCount = 0;
+	unsigned int startCount = 0;
+	unsigned int currentCount = 0;
+
 	ev3_sensor_config(EV3_PORT_1, TOUCH_SENSOR);
 
+	ButtonState button[NumOfButton];
+	button[StartButton].isPressed = ev3_touch_sensor_is_pressed(EV3_PORT_1);
+	button[StartButton].wasPressed = button[StartButton].isPressed;
+	button[ResetButton].isPressed = ev3_button_is_pressed(LEFT_BUTTON);
+	button[ResetButton].wasPressed = button[ResetButton].isPressed;
+
 	LcdClear();
+
 	while(1) {
+		button[StartButton].wasPressed = button[StartButton].isPressed;
+		button[StartButton].isPressed = ev3_touch_sensor_is_pressed(EV3_PORT_1);
+		button[ResetButton].wasPressed = button[ResetButton].isPressed;
+		button[ResetButton].isPressed = ev3_button_is_pressed(LEFT_BUTTON);
+		if (	(button[StartButton].isPressed) &&
+			(button[StartButton].isPressed != button[StartButton].wasPressed)) {
+			switch (mode) {
+			case StopMode:
+				mode = RunningMode;
+				startCount = ClockGetTime();
+			case RunningMode:
+				mode = StopMode;
+				baseCount = baseCount + ClockGetTime() - startCount;
+			default:
+				mode = StopMode;
+			}
+		}
+		if (	(button[ResetButton].isPressed) &&
+			(button[ResetButton].isPressed != button[StartButton].wasPressed)) {
+				mode = StopMode;
+				baseCount = 0;
+				startCount = 0;
+		}
+		switch (mode) {
+		case StopMode:
+			currentCount = baseCount;
+		case RunningMode:
+			currentCount = ClockGetTime() - startCount + baseCount;
+		default:
+			currentCount = 0;
+		}
+
 		if (ev3_button_is_pressed(LEFT_BUTTON)) {
 			ev3_led_set_color(LED_RED);
 		} else if (ev3_button_is_pressed(RIGHT_BUTTON)) {
@@ -47,7 +107,7 @@ void main_task(intptr_t unused) {
 		LcdDrawStringAtLine("TEXT", 1);
 		{
 			char text[100];
-			sprintf(text, "%d", ClockGetTime());
+			sprintf(text, "%d", currentCount);
 			LcdDrawStringAtLine(text, 2);
 		}
 		tslp_tsk(10);
