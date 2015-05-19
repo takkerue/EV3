@@ -7,7 +7,10 @@ TEST_GROUP(swButtonTestGroup) {
 };
 
 // テストケース TEST(group, name)
-TEST(swButtonTestGroup, getTest) {
+TEST(swButtonTestGroup, initialButtonState) {
+    SW_Button_init();
+    BYTES_EQUAL(false, SW_Button_isPressed(StartButton));
+    BYTES_EQUAL(false, SW_Button_isPressed(ResetButton));
 }
 
 int main(int argc, char** argv) {

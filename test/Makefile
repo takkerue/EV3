@@ -3,7 +3,7 @@ CXXFLAGS = -g -Wall -static -fprofile-arcs -ftest-coverage -I./ -I$(CPPUTEST_HOM
 LDFLAGS = -L./ -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt
 CPPUTEST_HOME = ./
 TARGET = ButtonTest
-SRCS = SW_Buttontest.cpp
+SRCS = SW_Buttontest.cpp ../SW_Button.c
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)
