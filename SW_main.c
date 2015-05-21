@@ -50,11 +50,14 @@ void SW_main(void) {
 			case StopMode:
 				mode = RunningMode;
 				startCount = ClockGetTime();
+				break;
 			case RunningMode:
 				mode = StopMode;
 				baseCount = baseCount + ClockGetTime() - startCount;
+				break;
 			default:
 				mode = StopMode;
+				break;
 			}
 		}
 		if (	(button[ResetButton].isPressed) &&
@@ -67,10 +70,13 @@ void SW_main(void) {
 		switch (mode) {
 		case StopMode:
 			currentCount = baseCount;
+			break;
 		case RunningMode:
 			currentCount = ClockGetTime() - startCount + baseCount;
+			break;
 		default:
 			currentCount = 0;
+			break;
 		}
 
 		if (ev3_button_is_pressed(LEFT_BUTTON)) {
