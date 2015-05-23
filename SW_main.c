@@ -2,21 +2,11 @@
 #include "app.h"
 
 #include "SW_main.h"
-#include "SW_DisplayView.h"
+#include "SW_DisplayView.h"	//TODO remove
+#include "SW_ButtonController.h"
 
 // 内部関数プロトタイプ宣言
 static int ClockGetTime();
-
-typedef struct {
-	unsigned char isPressed;
-	unsigned char wasPressed;
-} ButtonState;
-
-typedef enum {
-	StartButton = 0,
-	ResetButton,
-	NumOfButton
-} StopWatchButton;
 
 static unsigned int currentCount = 0;
 static StopWatchMode mode = StopMode;
@@ -25,20 +15,10 @@ void SW_main(void) {
 	unsigned int baseCount = 0;
 	unsigned int startCount = 0;
 	ev3_sensor_config(EV3_PORT_1, TOUCH_SENSOR);
-
-	ButtonState button[NumOfButton];
-	button[StartButton].isPressed = ev3_touch_sensor_is_pressed(EV3_PORT_1);
-	button[StartButton].wasPressed = button[StartButton].isPressed;
-	button[ResetButton].isPressed = ev3_button_is_pressed(LEFT_BUTTON);
-	button[ResetButton].wasPressed = button[ResetButton].isPressed;
-
+	SW_Button_init();//TODO remove
 	while(1) {
-		button[StartButton].wasPressed = button[StartButton].isPressed;
-		button[StartButton].isPressed = ev3_touch_sensor_is_pressed(EV3_PORT_1);
-		button[ResetButton].wasPressed = button[ResetButton].isPressed;
-		button[ResetButton].isPressed = ev3_button_is_pressed(LEFT_BUTTON);
-		if (	(button[StartButton].isPressed) &&
-			(button[StartButton].isPressed != button[StartButton].wasPressed)) {
+		SW_Button_update();//TODO remove
+		if (SW_Button_isPressed(StartButton) && SW_Button_isChanged(StartButton)) {
 			switch (mode) {
 			case StopMode:
 				mode = RunningMode;
@@ -53,8 +33,7 @@ void SW_main(void) {
 				break;
 			}
 		}
-		if (	(button[ResetButton].isPressed) &&
-			(button[ResetButton].isPressed != button[StartButton].wasPressed)) {
+		if (SW_Button_isPressed(ResetButton) && SW_Button_isChanged(ResetButton)) {
 				mode = StopMode;
 				baseCount = 0;
 				startCount = 0;
@@ -81,7 +60,7 @@ void SW_main(void) {
 		} else {
 			ev3_led_set_color(LED_OFF);
 		}
-		SW_DisplayView_update();
+		SW_DisplayView_update();//TODO remove
 
 		tslp_tsk(10);
 	}
