@@ -1,9 +1,10 @@
 #include "ev3api.h"
 #include "app.h"
 
+#include "SW_main.h"
+#include "SW_DisplayView.h"
+
 // 内部関数プロトタイプ宣言
-static void LcdClear(void);
-static void LcdDrawStringAtLine(char *str, uint32_t line);
 static int ClockGetTime();
 
 typedef struct {
@@ -17,19 +18,12 @@ typedef enum {
 	NumOfButton
 } StopWatchButton;
 
-typedef enum {
-	StopMode = 0,
-	RunningMode,
-	NumOfMode
-} StopWatchMode;
+static unsigned int currentCount = 0;
+static StopWatchMode mode = StopMode;
 
 void SW_main(void) {
-    StopWatchMode mode = StopMode;
 	unsigned int baseCount = 0;
 	unsigned int startCount = 0;
-	unsigned int currentCount = 0;
-	unsigned int refreshCount = 0;
-
 	ev3_sensor_config(EV3_PORT_1, TOUCH_SENSOR);
 
 	ButtonState button[NumOfButton];
@@ -39,13 +33,6 @@ void SW_main(void) {
 	button[ResetButton].wasPressed = button[ResetButton].isPressed;
 
 	while(1) {
-		if (refreshCount >= 10) {
-			refreshCount = 0;
-			LcdClear();
-		} else {
-			++refreshCount;
-		}
-
 		button[StartButton].wasPressed = button[StartButton].isPressed;
 		button[StartButton].isPressed = ev3_touch_sensor_is_pressed(EV3_PORT_1);
 		button[ResetButton].wasPressed = button[ResetButton].isPressed;
@@ -94,26 +81,38 @@ void SW_main(void) {
 		} else {
 			ev3_led_set_color(LED_OFF);
 		}
-		LcdDrawStringAtLine("STOP WATCH", 0);
-		{
-			const char *modeTaxts[NumOfMode] = {"STOP", "RUNNING" };
-			LcdDrawStringAtLine(modeTaxts[mode], 1);
-		}
-		{
-			char text[100];
-			int displayCount;
-			if (currentCount > 999999999) {
-				displayCount = 999999999;
-			} else {
-				displayCount = currentCount
-			}
-			sprintf(text, "%6d.%03d", displayCount / 1000, displayCount % 1000);
-			LcdDrawStringAtLine(text, 2);
-		}
+		SW_DisplayView_update();
+
 		tslp_tsk(10);
 	}
 }
 
+/**
+ * @brief ストップウォッチ計測時間の取得
+ * @return 計測時間[ms]
+ */
+unsigned int SW_currentTimeMs(void)
+{
+	return currentCount;
+}
+
+/**
+ * @brief ストップウォッチのモードの取得
+ * @return モード
+ */
+StopWatchMode SW_mode(void)
+{
+	return mode;
+}
+
+/**
+ * @brief ストップウォッチ計測時間の取得
+ * @return 計測時間[ms]
+ */
+StopWatchMode SW_currentMode(void)
+{
+	return mode;
+}
 /**
  * @brief タイマカウンタの取得
  * @return タイマカウンタ[ms]
@@ -123,24 +122,4 @@ static int ClockGetTime()
 	SYSTIM count;
 	get_tim(&count);
 	return (int)count;
-}
-
-/**
- * @brief LCD表示内容のクリア
- */
-static void LcdClear(void) {
-	ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE); // Clear menu area
-	return;
-}
-
-/**
- * @brief LCDのline行分改行した位置に文字列表示
- */
-static void LcdDrawStringAtLine(char *str, uint32_t line) {
-	int32_t fontHeight = 0;
-	int32_t fontWidth = 0;
-	ev3_lcd_set_font(EV3_FONT_MEDIUM);
-	ev3_font_get_size(EV3_FONT_MEDIUM, &fontWidth, &fontHeight);
-	ev3_lcd_draw_string(str, 0, (int32_t)(fontHeight * 1.5 * line));
-	return;
 }
